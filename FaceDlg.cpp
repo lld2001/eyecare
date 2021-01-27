@@ -18,7 +18,7 @@ static char THIS_FILE[] = __FILE__;
 /////////////////////////////////////////////////////////////////////////////
 // CFaceDlg dialog
 
-
+int CFaceDlg::TimerId = 1; 
 CFaceDlg::CFaceDlg(CWnd* pParent /*=NULL*/)
 	: CDialog(CFaceDlg::IDD, pParent),m_rcClip(0,0,0,0)
 {
@@ -73,8 +73,9 @@ lStyle &= ~WS_CAPTION;
 	SetWindowPos(&this->wndTopMost, 0, 0, 0, 0, SWP_NOMOVE|SWP_NOSIZE);
 #endif
 	ShowCursor(FALSE);
-	SetTimer(USE_TIMER, SECOND, NULL);
-
+	SetTimer(TimerId, SECOND, NULL);
+	
+	Enable(FALSE);//锁定
 	return TRUE;  // return TRUE unless you set the focus to a control
 	              // EXCEPTION: OCX Property Pages should return FALSE
 }
@@ -120,15 +121,7 @@ void CFaceDlg::PostNcDestroy()
 }
 
 void CFaceDlg::OnPaint() 
-{/*
- CBitmap   *pBitmap;   
- pBitmap=new   CBitmap();//画刷中的位图   
- bResult=pBitmap->LoadBitmap(IDB_BITMAP1);   
- //？？如何倾斜   
- NewBrush.CreatePatternBrush(pBitmap);   
- pDC->SelectObject(&NewBrush);   
-  pDC->Polygon(m_pPoints,m_pNum);                       	
-	*/
+{
 	CPaintDC dc(this); // device context for painting
 	CDC memDC;
 	memDC.CreateCompatibleDC(&dc);
@@ -142,7 +135,6 @@ void CFaceDlg::OnPaint()
 	memDC.SelectObject(&brush);
 	CRect rcClip;
 	dc.GetClipBox(rcClip);
-//	memDC.PatBlt(rcClip.left,rcClip.top,rcClip.Width(),rcClip.Height(),PATCOPY);
 	memDC.FillRect(rcClip,&brush);
 
 	CFont*pFont=memDC.SelectObject(&m_font);
@@ -157,27 +149,18 @@ void CFaceDlg::OnPaint()
 
 void CFaceDlg::OnTimer(UINT nIDEvent) 
 {	
-	m_nCount--;
 	TRACE1( "秒数 = %d\n", m_nCount );
 	if(m_nCount < 0){
+		KillTimer(TimerId);
 		DestroyWindow();
 		return;
+	}else{
+		m_strOutText.Format("休息倒计时：%2d分%2d秒",m_nCount / 60, m_nCount % 60);
+		Invalidate(FALSE);
+		UpdateWindow();		
 	}
-	m_strOutText.Format("休息倒计时：%2d分%2d秒",m_nCount / 60, m_nCount % 60);
-	if (m_rcClip.Width()==0)
-	{
-		CRect rectClient;
-		GetClientRect(rectClient);
-		CDC *pDC=GetDC();
-		CFont *pFont=pDC->SelectObject(&m_font);
-		CSize size=pDC->GetTextExtent(m_strOutText);
-		int x=(rectClient.right-size.cx)/2;
-		int y=(rectClient.bottom-size.cy)/2;
-		CRect rcInvalid(x,y,x+size.cx,y+size.cy);
-		m_rcClip=rcInvalid;
-		pDC->SelectObject(pFont);
-	}
-	InvalidateRect(m_rcClip);
+	m_nCount--;
+
 	CDialog::OnTimer(nIDEvent);
 }
 

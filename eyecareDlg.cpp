@@ -157,7 +157,7 @@ END_MESSAGE_MAP()
 
 /////////////////////////////////////////////////////////////////////////////
 // CEyecareDlg dialog
-
+int CEyecareDlg::TimerId = 1; 
 CEyecareDlg::CEyecareDlg(CWnd* pParent /*=NULL*/)
 	: CDialog(CEyecareDlg::IDD, pParent)
 {
@@ -217,16 +217,28 @@ END_MESSAGE_MAP()
 
 void CEyecareDlg::Show(){//显示设置窗口
 	isParamChanged=FALSE;
-	UpdateLastRest();
+	
+	CString cs;
+	time_t now;
+	time(&now);
+	long usedTime =static_cast<long>(difftime(now, lastTime));
+	long usedSec = usedTime % (MINUTE);
+	usedTime /= (MINUTE);//秒 TO 分
+	cs.Format("%5d分%2d秒", usedTime, usedSec);
+	m_strLastRest=cs;
+	UpdateData(FALSE);
+
 	ModifyStyle(WS_POPUP, WS_CAPTION);
 	ModifyStyleEx(WS_EX_TOOLWINDOW, WS_EX_TOPMOST);
 	ShowWindow(SW_SHOW);
 }
+
 void CEyecareDlg::Hide(){//隐藏设置窗口
 	ShowWindow(SW_HIDE);
 	ModifyStyle(WS_CAPTION, WS_POPUP);
 	ModifyStyleEx(WS_EX_TOPMOST, WS_EX_TOOLWINDOW);
 }
+
 /////////////////////////////////////////////////////////////////////////////
 // CEyecareDlg message handlers
 BOOL CEyecareDlg::OnInitDialog()
@@ -314,8 +326,7 @@ BOOL CEyecareDlg::OnInitDialog()
 		lpFace->Create(IDD_FACEDLG_DIALOG);
 		lpFace->ShowWindow(SW_SHOWMAXIMIZED);
 	}else{
-		SetTimer(USE_TIMER, 
-			useTime * MINUTE * SECOND, NULL);	
+		SetTimer(TimerId, useTime * MINUTE * SECOND, NULL);	
 	}
 
 	return TRUE;  // return TRUE  unless you set the focus to a control
@@ -412,7 +423,7 @@ void CEyecareDlg::OnSetup(){
 }
 
 void CEyecareDlg::OnExit(){
-	::KillTimer(this->GetSafeHwnd(), USE_TIMER);
+	KillTimer(TimerId);
 	Enable(TRUE);//解出锁定
 
 	NOTIFYICONDATA tnid;//删除任务栏图标
@@ -572,15 +583,21 @@ void CEyecareDlg::OnCheckautorun()
 	UpdateData(FALSE);
 	isParamChanged=TRUE;	
 }
+
 void CEyecareDlg::UpdateLastRest(){
 	CString cs;
 	time_t now;
 	time(&now);
+
 	long usedTime =static_cast<long>(difftime(now, lastTime));
-	usedTime /= 60;//秒 TO 分
-	cs.Format("%5d分钟", usedTime);
+	long usedSec = usedTime % (MINUTE);
+	usedTime /= (MINUTE);//秒 TO 分
+	
+	cs.Format("%5d分%2d秒", usedTime, usedSec);
 	m_strLastRest=cs;
 	UpdateData(FALSE);
+
+	lastTime = now;
 }
 
 #ifdef _DEBUG
@@ -670,7 +687,7 @@ void CEyecareDlg::OnMyOK()
 			return;		
 		}			
 		isParamChanged = FALSE;
-		MessageBox("设置成功！新的配置立即起作用。",
+		MessageBox("设置成功！新的配置下次启用。",
 			"成功",MB_ICONASTERISK);
 		WriteConfigFile();
 	}
@@ -696,13 +713,13 @@ void CEyecareDlg::PostNcDestroy()
 void CEyecareDlg::OnTimer(UINT nIDEvent) 
 {
 	// TODO: Add your message handler code here and/or call default
-	KillTimer(USE_TIMER);
-	SetTimer(USE_TIMER, (useTime + restTime + tipTime) * MINUTE * SECOND + SECOND, NULL);
 
 	CTipDialog*	dlg= new CTipDialog();
 	dlg->Create(IDD_TIP_DIALOG);
 	dlg->ShowWindow(SW_SHOW);
 
+	KillTimer(TimerId);
+	SetTimer(TimerId, (useTime + restTime) * MINUTE * SECOND + (tipTime * SECOND), NULL);
 
 	CDialog::OnTimer(nIDEvent);
 }

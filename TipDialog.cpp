@@ -45,22 +45,21 @@ END_MESSAGE_MAP()
 
 /////////////////////////////////////////////////////////////////////////////
 // CTipDialog message handlers
-int Tip_Count=0;
+
 void CTipDialog::OnTimer(UINT nIDEvent) 
 {
 	// TODO: Add your message handler code here and/or call default
-
-
-	CString cs;
-	cs.Format("还有%2d秒!", m_Tip_Count);
-	GetDlgItem(IDOK)->SetWindowText(cs);
-
 	if(m_Tip_Count < 0){
 		KillTimer(TimerId);
 		DestroyWindow();
 		return;
+	}else{
+		CString cs;
+		cs.Format("还有%2d秒!", m_Tip_Count);
+		GetDlgItem(IDOK)->SetWindowText(cs);
+		Invalidate(FALSE);
+		UpdateWindow();
 	}
-
 	m_Tip_Count--;
 
 	CDialog::OnTimer(nIDEvent);

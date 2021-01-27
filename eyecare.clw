@@ -16,9 +16,9 @@ Class4=CFaceDlg
 Class5=CTipDialog
 
 ResourceCount=5
-Resource1=IDD_FACEDLG_DIALOG
-Resource2=IDD_ABOUTBOX
-Resource3=IDD_EYECARE_DIALOG
+Resource1=IDD_EYECARE_DIALOG
+Resource2=IDD_FACEDLG_DIALOG
+Resource3=IDD_ABOUTBOX
 Resource4=IDD_TIP_DIALOG
 Resource5=IDR_BEGINMENU
 
@@ -67,7 +67,7 @@ Class=CAboutDlg
 ControlCount=4
 Control1=IDC_STATIC,static,1342177283
 Control2=IDC_STATIC,static,1342308352
-Control3=IDOK,button,1342406656
+Control3=IDOK,button,1342407424
 Control4=IDC_STATIC,static,1342308352
 
 [DLG:IDD_FACEDLG_DIALOG]

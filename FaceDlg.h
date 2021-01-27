@@ -14,6 +14,7 @@
 
 class CFaceDlg : public CDialog
 {
+static int TimerId;
 // Construction
 public:
 	CFaceDlg(CWnd* pParent = NULL);   // standard constructor

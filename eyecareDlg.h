@@ -15,6 +15,7 @@
 
 class CEyecareDlg : public CDialog
 {
+	static int TimerId;
 // Construction
 public:
 	CEyecareDlg(CWnd* pParent = NULL);	// standard constructor
