@@ -3,33 +3,31 @@
 <pre>
 <h1>Build Log</h1>
 <h3>
---------------------Configuration: eyecare - Win32 Release--------------------
+--------------------Configuration: eyecare - Win32 Debug--------------------
 </h3>
 <h3>Command Lines</h3>
-Creating command line "rc.exe /l 0x804 /fo"Release/eyecare.res" /d "NDEBUG" /d "_AFXDLL" "Z:\eyecareNew\eyecare\eyecare.rc"" 
-Creating temporary file "C:\DOCUME~1\admin\LOCALS~1\Temp\RSP4F2.tmp" with contents
+Creating temporary file "C:\DOCUME~1\admin\LOCALS~1\Temp\RSP5DC.tmp" with contents
 [
-/nologo /MD /W3 /GX /O1 /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /D "_AFXDLL" /D "_MBCS" /FR"Release/" /Fp"Release/eyecare.pch" /Yu"stdafx.h" /Fo"Release/" /Fd"Release/" /FD /c 
-"Z:\eyecareNew\eyecare\eyecare.cpp"
+/nologo /MDd /W3 /Gm /GX /ZI /Od /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /D "_AFXDLL" /D "_MBCS" /FR"Debug/" /Fp"Debug/eyecare.pch" /Yu"stdafx.h" /Fo"Debug/" /Fd"Debug/" /FD /GZ /c 
+"Z:\eyecareNew\eyecare\FaceDlg.cpp"
 ]
-Creating command line "cl.exe @C:\DOCUME~1\admin\LOCALS~1\Temp\RSP4F2.tmp" 
-Creating temporary file "C:\DOCUME~1\admin\LOCALS~1\Temp\RSP4F3.tmp" with contents
+Creating command line "cl.exe @C:\DOCUME~1\admin\LOCALS~1\Temp\RSP5DC.tmp" 
+Creating temporary file "C:\DOCUME~1\admin\LOCALS~1\Temp\RSP5DD.tmp" with contents
 [
-/nologo /subsystem:windows /incremental:no /pdb:"Release/eyecare.pdb" /machine:I386 /out:"Release/eyecare.exe" 
-.\Release\eyecare.obj
-.\Release\eyecareDlg.obj
-.\Release\FaceDlg.obj
-.\Release\StdAfx.obj
-.\Release\TipDialog.obj
-.\Release\eyecare.res
+/nologo /subsystem:windows /incremental:yes /pdb:"Debug/eyecare.pdb" /debug /machine:I386 /out:"Debug/eyecare.exe" /pdbtype:sept 
+.\Debug\eyecare.obj
+.\Debug\eyecareDlg.obj
+.\Debug\FaceDlg.obj
+.\Debug\StdAfx.obj
+.\Debug\TipDialog.obj
+.\Debug\eyecare.res
 ]
-Creating command line "link.exe @C:\DOCUME~1\admin\LOCALS~1\Temp\RSP4F3.tmp"
+Creating command line "link.exe @C:\DOCUME~1\admin\LOCALS~1\Temp\RSP5DD.tmp"
 <h3>Output Window</h3>
-Compiling resources...
 Compiling...
-eyecare.cpp
+FaceDlg.cpp
 Linking...
-Creating command line "bscmake.exe /nologo /o"Release/eyecare.bsc"  .\Release\StdAfx.sbr .\Release\eyecare.sbr .\Release\eyecareDlg.sbr .\Release\FaceDlg.sbr .\Release\TipDialog.sbr"
+Creating command line "bscmake.exe /nologo /o"Debug/eyecare.bsc"  .\Debug\StdAfx.sbr .\Debug\eyecare.sbr .\Debug\eyecareDlg.sbr .\Debug\FaceDlg.sbr .\Debug\TipDialog.sbr"
 Creating browse info file...
 <h3>Output Window</h3>
 

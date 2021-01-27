@@ -4,6 +4,7 @@
 #include "stdafx.h"
 #include "eyecare.h"
 #include "TipDialog.h"
+#include "global.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -11,7 +12,7 @@
 static char THIS_FILE[] = __FILE__;
 #endif
 
-extern int tipTime;
+
 /////////////////////////////////////////////////////////////////////////////
 // CTipDialog dialog
 
@@ -23,6 +24,7 @@ CTipDialog::CTipDialog(CWnd* pParent /*=NULL*/)
 	//{{AFX_DATA_INIT(CTipDialog)
 		// NOTE: the ClassWizard will add member initialization here
 	//}}AFX_DATA_INIT
+	m_Tip_Count = tipTime;
 }
 
 
@@ -47,16 +49,20 @@ int Tip_Count=0;
 void CTipDialog::OnTimer(UINT nIDEvent) 
 {
 	// TODO: Add your message handler code here and/or call default
-	if(Tip_Count >= (tipTime-1)){
-		Tip_Count=0;
+
+
+	CString cs;
+	cs.Format("还有%2d秒!", m_Tip_Count);
+	GetDlgItem(IDOK)->SetWindowText(cs);
+
+	if(m_Tip_Count < 0){
 		KillTimer(TimerId);
 		DestroyWindow();
 		return;
 	}
-	Tip_Count++;
-	CString cs;
-	cs.Format("还有%2d秒!", tipTime - Tip_Count);
-	GetDlgItem(IDOK)->SetWindowText(cs);
+
+	m_Tip_Count--;
+
 	CDialog::OnTimer(nIDEvent);
 }
 
@@ -67,7 +73,7 @@ BOOL CTipDialog::OnInitDialog()
 	CDialog::OnInitDialog();
 	
 	// TODO: Add extra initialization here
-	SetTimer(TimerId,1000,NULL);
+	SetTimer(TimerId,SECOND,NULL);
 	CString cs;
 	cs.Format("还有%2d秒!", tipTime);
 	m_bOK.SetWindowText(cs);
@@ -79,6 +85,10 @@ BOOL CTipDialog::OnInitDialog()
 void CTipDialog::PostNcDestroy() 
 {
 	// TODO: Add your specialized code here and/or call the base class
+	CFaceDlg *lpFace = new CFaceDlg();
+	lpFace->Create(IDD_FACEDLG_DIALOG);
+	lpFace->ShowWindow(SW_SHOWMAXIMIZED);
+
 	CDialog::PostNcDestroy();
 	delete this;
 }

@@ -16,11 +16,13 @@
 
 #define USE_TIMER 1
 #ifdef _DEBUG
-	#define MINUTE	60//调试时设为1
+	#define MINUTE	1//调试时设为1
+	#define	SECOND	500
 #else
 	#define MINUTE	60
+	#define	SECOND	1000
 #endif
-#define	SECOND	1000
+
 
 /////////////////////////////////////////////////////////////////////////////
 // CEyecareApp:

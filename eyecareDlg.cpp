@@ -36,7 +36,6 @@ time_t lastTime;
 int exitAfterRest;
 int runOnce;
 
-CFaceDlg *lpFace=NULL;
 BOOL isEnable = TRUE;
 HINSTANCE hmod;//Dll模块
 /*
@@ -110,50 +109,6 @@ typedef int (WINAPI*  lpCtrlAltDel_Enable_Disable)(BOOL);
 #endif
 }
 
-void CALLBACK TipTimerProc(//提醒定时器的回调函数
-   HWND hWnd,      // handle of CWnd that called SetTimer
-   UINT nMsg,      // WM_TIMER
-   UINT nIDEvent,   // timer identification
-   DWORD dwTime    // system time
-   ){
-	CWnd  *wnd=CWnd::FromHandle(hWnd);
-	int WAIT_DIALOG_INIT=10000;
-	switch(nMsg){
-	case WM_TIMER:
-		lpFace = new CFaceDlg();
-		lpFace->Create(IDD_FACEDLG_DIALOG);
-		::SetTimer(wnd->GetSafeHwnd(), USE_TIMER, 
-			WAIT_DIALOG_INIT*MINUTE*SECOND, NULL);		
-		Enable(FALSE);//锁定
-		break;
-	default:
-		break;
-	}
-}
-void CALLBACK TimerProc(//休息定时器的回调函数
-   HWND hWnd,      // handle of CWnd that called SetTimer
-   UINT nMsg,      // WM_TIMER
-   UINT nIDEvent,   // timer identification
-   DWORD dwTime    // system time
-   ){
-		CWnd  *wnd=CWnd::FromHandle(hWnd);
-		CTipDialog *dlg;
-		//	CString c;
-	switch(nMsg){
-	case WM_TIMER:
-		//c.Format("%d秒后锁定电脑，请作好准备。",tipTime);
-		//TRACE(c);
-		::SetTimer(wnd->GetSafeHwnd(), USE_TIMER, 
-			tipTime*SECOND, TipTimerProc);
-		dlg= new CTipDialog();
-		dlg->Create(IDD_TIP_DIALOG);
-		dlg->ShowWindow(SW_SHOW);
-		//::AfxMessageBox(c, MB_OK);
-		break;
-	default:
-		break;
-	}
-}
 /////////////////////////////////////////////////////////////////////////////
 // CAboutDlg dialog used for App About
 
@@ -213,25 +168,8 @@ CEyecareDlg::CEyecareDlg(CWnd* pParent /*=NULL*/)
 	//}}AFX_DATA_INIT
 	// Note that LoadIcon does not require a subsequent DestroyIcon in Win32
 	m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
-	
-	//read config from .ini
-	CString c;
-	int use=::GetPrivateProfileInt(USE_FIELD, VALUE,45,CONFIG_FILE);
-	useTime = use;
-	int rest=::GetPrivateProfileInt(REST_FIELD, VALUE,3,CONFIG_FILE);
-	restTime = rest;
-	int tip=::GetPrivateProfileInt(TIP_FIELD, VALUE,10,CONFIG_FILE);
-	tipTime = tip;
-	int ex = ::GetPrivateProfileInt(EXIT_AFTER_REST, VALUE, 0, CONFIG_FILE);
-	exitAfterRest = ex;
-	runOnce = 0;
-	//如带命令行-once，只运行一次
-	CString s(AfxGetApp()->m_lpCmdLine);
-	if(s == CString(_T("-once"))){
-		runOnce = 1;
-		//MessageBox(s, "注意",MB_ICONASTERISK );
-	}
 }
+
 CEyecareDlg::~CEyecareDlg(){
 #ifdef	_DEBUG
 	GlobalDeleteAtom(m_atomId);
@@ -267,6 +205,8 @@ BEGIN_MESSAGE_MAP(CEyecareDlg, CDialog)
 	ON_CBN_SELCHANGE(IDC_COMBOTIP, OnSelchangeCombotip)
 	ON_BN_CLICKED(IDC_OK, OnMyOK)
 	ON_BN_CLICKED(IDC_CANCEL, OnMyCancel)
+	ON_WM_TIMER()
+	ON_WM_DESTROY()
 	//}}AFX_MSG_MAP
 	ON_MESSAGE(WM_TRAY, OnTray)
 	ON_COMMAND(ID_EXIT, OnExit)
@@ -331,6 +271,21 @@ BOOL CEyecareDlg::OnInitDialog()
 	SetIcon(m_hIcon, FALSE);		// Set small icon
 	
 	// TODO: Add extra initialization here
+
+	//read config from .ini
+	CString c;
+
+	ReadConfigFile();
+
+	runOnce = 0;
+	//如带命令行-once，只运行一次
+	CString s(AfxGetApp()->m_lpCmdLine);
+	if(s == CString(_T("-once"))){
+		runOnce = 1;
+		//MessageBox(s, "注意",MB_ICONASTERISK );
+	}
+
+
 	char tip[] ="保护好您的眼睛!";
 	NOTIFYICONDATA tnd;
 	tnd.cbSize=sizeof(NOTIFYICONDATA);
@@ -347,7 +302,6 @@ BOOL CEyecareDlg::OnInitDialog()
 	//SetWindowPos(&this->wndTopMost, 0, 0, 0, 0, SWP_NOMOVE|SWP_NOSIZE);
 	ModifyStyleEx(WS_EX_APPWINDOW,WS_EX_TOOLWINDOW,0);
 
-	ReadConfigFile();
 	UpdateData(FALSE);
 	UpdateLastRest();
 
@@ -356,16 +310,17 @@ BOOL CEyecareDlg::OnInitDialog()
 
 	//设置定时器
 	if(runOnce == 1){
-		::SetTimer(GetSafeHwnd(), USE_TIMER, 
-			1, TimerProc);	
+		CFaceDlg *lpFace = new CFaceDlg();
+		lpFace->Create(IDD_FACEDLG_DIALOG);
+		lpFace->ShowWindow(SW_SHOWMAXIMIZED);
 	}else{
-		::SetTimer(GetSafeHwnd(), USE_TIMER, 
-			useTime*MINUTE*SECOND, TimerProc);	
+		SetTimer(USE_TIMER, 
+			useTime * MINUTE * SECOND, NULL);	
 	}
 
 	return TRUE;  // return TRUE  unless you set the focus to a control
 }
-
+ 
 void CEyecareDlg::OnSysCommand(UINT nID, LPARAM lParam)
 {
 	if ((nID & 0xFFF0) == IDM_ABOUTBOX)
@@ -541,6 +496,8 @@ void CEyecareDlg::ReadConfigFile(){
 	int use=::GetPrivateProfileInt(USE_FIELD, VALUE,USE_DEFAULT,CONFIG_FILE);
 	int rest=::GetPrivateProfileInt(REST_FIELD, VALUE,REST_DEFAULT,CONFIG_FILE);
 	int tip=::GetPrivateProfileInt(TIP_FIELD, VALUE,TIP_DEFAULT,CONFIG_FILE);
+	int ex = ::GetPrivateProfileInt(EXIT_AFTER_REST, VALUE, 0, CONFIG_FILE);
+	exitAfterRest = ex;
 
 	if(use >= USE_DOWN_TIME){//自定义使用时间
 		c.Format("%d", use);
@@ -735,3 +692,26 @@ void CEyecareDlg::PostNcDestroy()
 }
 
 
+
+void CEyecareDlg::OnTimer(UINT nIDEvent) 
+{
+	// TODO: Add your message handler code here and/or call default
+	KillTimer(USE_TIMER);
+	SetTimer(USE_TIMER, (useTime + restTime + tipTime) * MINUTE * SECOND + SECOND, NULL);
+
+	CTipDialog*	dlg= new CTipDialog();
+	dlg->Create(IDD_TIP_DIALOG);
+	dlg->ShowWindow(SW_SHOW);
+
+
+	CDialog::OnTimer(nIDEvent);
+}
+
+void CEyecareDlg::OnDestroy() 
+{
+	CDialog::OnDestroy();
+	
+	// TODO: Add your message handler code here
+	// exit when destroy main window
+	OnExit();	
+}

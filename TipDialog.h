@@ -14,6 +14,8 @@ class CTipDialog : public CDialog
 {
 // Construction
 static int TimerId;
+private:
+	int m_Tip_Count;
 public:
 	CTipDialog(CWnd* pParent = NULL);   // standard constructor
 	~CTipDialog(){

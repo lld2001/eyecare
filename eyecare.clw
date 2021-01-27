@@ -16,10 +16,10 @@ Class4=CFaceDlg
 Class5=CTipDialog
 
 ResourceCount=5
-Resource1=IDD_ABOUTBOX
-Resource2=IDD_FACEDLG_DIALOG
-Resource3=IDD_TIP_DIALOG
-Resource4=IDD_EYECARE_DIALOG
+Resource1=IDD_FACEDLG_DIALOG
+Resource2=IDD_ABOUTBOX
+Resource3=IDD_EYECARE_DIALOG
+Resource4=IDD_TIP_DIALOG
 Resource5=IDR_BEGINMENU
 
 [CLS:CEyecareApp]

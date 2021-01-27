@@ -5,6 +5,7 @@
 #include "eyecare.h"
 #include "FaceDlg.h"
 #include "eyecaredlg.h"
+#include "global.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -46,7 +47,7 @@ END_MESSAGE_MAP()
 /////////////////////////////////////////////////////////////////////////////
 // CFaceDlg message handlers
 
-extern int restTime;
+
 BOOL CFaceDlg::OnInitDialog() 
 {	
 	CDialog::OnInitDialog();
@@ -72,8 +73,7 @@ lStyle &= ~WS_CAPTION;
 	SetWindowPos(&this->wndTopMost, 0, 0, 0, 0, SWP_NOMOVE|SWP_NOSIZE);
 #endif
 	ShowCursor(FALSE);
-	::SetTimer(GetSafeHwnd(), USE_TIMER, SECOND, NULL);
-
+	SetTimer(USE_TIMER, SECOND, NULL);
 
 	return TRUE;  // return TRUE unless you set the focus to a control
 	              // EXCEPTION: OCX Property Pages should return FALSE
@@ -95,19 +95,8 @@ HBRUSH CFaceDlg::OnCtlColor(CDC *pDC, CWnd *pWnd, UINT nCtlColor){
 
 	return NULL;
 }
-void CALLBACK TimerProc(//休息定时器的回调函数
-   HWND hWnd,      // handle of CWnd that called SetTimer
-   UINT nMsg,      // WM_TIMER
-   UINT nIDEvent,   // timer identification
-   DWORD dwTime    // system time
-   );
 
-extern int useTime;
-extern time_t lastTime;
-extern int exitAfterRest;
-extern int runOnce;
-void Enable(BOOL);
-extern CFaceDlg *lpFace;
+
 void CFaceDlg::PostNcDestroy() 
 {
 	// TODO: Add your specialized code here and/or call the base class
@@ -121,16 +110,13 @@ void CFaceDlg::PostNcDestroy()
 	
 	//休息结束退出
 	if((exitAfterRest == 1) || (runOnce == 1)){
-		TRACE("exit app");
-		PostQuitMessage(0);
-	}else{
-		::SetTimer(::AfxGetApp()->GetMainWnd()->GetSafeHwnd(),
-			USE_TIMER, useTime*MINUTE*SECOND, TimerProc);		
+		TRACE("exit app \n");
+		::PostMessage(::AfxGetApp()->GetMainWnd()->GetSafeHwnd(), WM_DESTROY, 0, 0);
+		//PostQuitMessage(0);
 	}
 
 	CDialog::PostNcDestroy();
-	if(lpFace!=NULL)
-		delete lpFace;
+	delete this;
 }
 
 void CFaceDlg::OnPaint() 

@@ -78,6 +78,8 @@ protected:
 	afx_msg void OnSelchangeCombotip();
 	afx_msg void OnMyOK();
 	afx_msg void OnMyCancel();
+	afx_msg void OnTimer(UINT nIDEvent);
+	afx_msg void OnDestroy();
 	//}}AFX_MSG
 	LRESULT OnTray(WPARAM wParam, LPARAM lParam);
 	afx_msg void OnExit();
